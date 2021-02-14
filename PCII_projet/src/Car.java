@@ -5,7 +5,8 @@ import java.awt.event.KeyListener;
 /**Classe qui represente le vehicule*/
 public class Car implements KeyListener {
 	public float position = 0f;//position du vehicule
-	public Affichage panel;//L'affichage
+	public Affichage panel;//L'affichage 
+	public float distance = 0f ;
 
 	@Override
 	public void keyTyped(KeyEvent e) {
@@ -28,8 +29,9 @@ public class Car implements KeyListener {
 
 		case KeyEvent.VK_RIGHT:
 			position += 0.05;
-
 			break;
+		case KeyEvent.VK_UP:
+			distance += 200 ;
 		}
 		panel.repaint();
 
