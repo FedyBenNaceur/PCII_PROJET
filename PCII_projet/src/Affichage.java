@@ -20,6 +20,7 @@ public class Affichage extends JPanel {
 	public Car vehicule;
 	private BufferedImage background;
 	private BufferedImage car;
+	private int dimBack = (int)HEIGHT/5 ;
 
 	/* constructeur de la classe Affichage */
 	public Affichage(Road r, Car c) {
@@ -75,14 +76,10 @@ public class Affichage extends JPanel {
 	 * @param g
 	 */
 	private void drawRoad(Graphics g) {
-        road.findPos();
-		ArrayList<Line> tmp = road.getLines();
-		float targetCurvature = road.curvs.get(road.tracksection-1).getFst();
-		float diff = targetCurvature - road.curvature ;		
-		
+	    	
 		int i = 0;
 		while (i < road.sizeR - 1) {
-			Line l = tmp.get(i);
+			Line l = road.lines.get(i);
 			float persp = l.project();
 			float midddlePoint = road.middlePoint  ;
 			
@@ -93,7 +90,7 @@ public class Affichage extends JPanel {
 			int rightGrass = (int) ((midddlePoint + rWidth + cWidth) * WIDTH);
 			int rightClip = (int) ((midddlePoint + rWidth) * WIDTH);
 
-			Line p = tmp.get(i + 1);
+			Line p = road.lines.get(i + 1);
 			Color grass = Math.sin(70.0f *  Math.pow(1.0f - persp,3) + vehicule.distance * 0.1f) > 0.0f ? new Color(16, 200, 16) : new Color(0, 154, 0);
 			Color clip = Math.sin(80.0f *  Math.pow(1.0f - persp, 3) + vehicule.distance) > 0.0f ? new Color(255, 255, 255) : new Color(255, 0, 0);
 			Color r = Color.gray;
@@ -110,7 +107,7 @@ public class Affichage extends JPanel {
 	 * Methode qui paint l'arriere plan
 	 */
 	private void drawBackground(Graphics g) {
-		g.drawImage(background, 0, 0, WIDTH,HEIGHT /5, this);
+		g.drawImage(background, 0, 0, WIDTH,dimBack, this);
 	}
 
 }

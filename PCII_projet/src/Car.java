@@ -10,7 +10,7 @@ public class Car   extends KeyAdapter implements ActionListener {
 	public float position = 0.0f;// position du vehicule
 	public Affichage panel;// L'affichage
 	public float distance = 0f;
-	private final float speed = 10f;
+	private final float speed = 5f;
 	private boolean isUp, isLeft, isRight;
 	
 	/*public Car () {
