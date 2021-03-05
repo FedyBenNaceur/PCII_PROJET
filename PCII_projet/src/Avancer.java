@@ -11,7 +11,7 @@ public class Avancer extends Thread{
 	@Override
 	public void run() {
 		try {
-			panel.road.setPos();
+
 			panel.repaint();
 			Thread.sleep(time_to_sleep);
 		}catch (Exception e ) {
