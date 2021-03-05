@@ -10,14 +10,13 @@ public class Car   extends KeyAdapter implements ActionListener {
 	public float position = 0.0f;// position du vehicule
 	public Affichage panel;// L'affichage
 	public float distance = 0f;
-	private final float speed = 5f;
+	public float speed = 0f;
+	private final float acceleration = 0.5f ; 
+	private final float maxSpeed = 10f ; 
 	private boolean isUp, isLeft, isRight;
-	
-	/*public Car () {
-		isUp =false ;
-		isLeft = false ; 
-		isRight = false;
-	}*/
+	private boolean stopped = true ; 
+	private boolean released = true ;
+ 
 
 	@Override
 	public void keyTyped(KeyEvent e) {
@@ -33,28 +32,33 @@ public class Car   extends KeyAdapter implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		if (isUp)
+		if (!released && speed<=maxSpeed) {
+			speed += acceleration;
+		}else if(released && speed-acceleration>=0){
+			speed -= acceleration ;
+		}		
+		if (isUp||stopped)
 			distance += speed;
 		if (isLeft)
 			position -= speed /50;
 		if (isRight)
 			position += speed / 50;
-		
-
 		panel.repaint();
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-
+        released  = false ; 
+        stopped = false ; 
 		int code = e.getKeyCode();
-	
 		update(code,true);
 	
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+		stopped = true ;
+		released = true ;
 		int code = e.getKeyCode();		
 		update(code,false);
 

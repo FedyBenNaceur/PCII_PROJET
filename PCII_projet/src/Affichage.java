@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -21,12 +22,15 @@ public class Affichage extends JPanel {
 	private BufferedImage background;
 	private BufferedImage car;
 	private int dimBack = (int)HEIGHT/5 ;
+	private JLabel speed;
 
 	/* constructeur de la classe Affichage */
 	public Affichage(Road r, Car c) {
 		this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		road = r;
 		vehicule = c;
+		this.speed = new JLabel("Speed");
+		this.add(speed);
 		URL url1Img=getClass().getResource("/background.png");
 		URL url2Img=getClass().getResource("/newcar.png");
         try {
@@ -41,10 +45,14 @@ public class Affichage extends JPanel {
 
 	@Override
 	public void paint(Graphics g) {
+		g.drawImage(background, 0, 0, WIDTH,dimBack, this);
+		setOpaque(false);
 		super.paint(g);
 		drawRoad(g);
-		drawBackground(g);
+		//drawBackground(g);
+		setOpaque(true);
 		drawCar(g);
+		setSpeed();
 
 	}
 
@@ -108,6 +116,10 @@ public class Affichage extends JPanel {
 	 */
 	private void drawBackground(Graphics g) {
 		g.drawImage(background, 0, 0, WIDTH,dimBack, this);
+	}
+	
+	private void setSpeed() {
+		this.speed.setText("Score:" + this.vehicule.speed);
 	}
 
 }

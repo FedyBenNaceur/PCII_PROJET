@@ -37,7 +37,6 @@ public class Road {
 			lines.add(line);
 			i++;
 		}
-		System.out.print(i);
 		sizeR = lines.size();
 	}
 
