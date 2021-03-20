@@ -1,17 +1,14 @@
 
 public class Line {
-	float x,y,z;
-	float camD = 0.84f ;
-	int width = 1280 ;
-	int height = 1024;
-	private float curve ;
+      public int  y = 0 ;
+      public int height = 768 ;
+      public int width = 1600 ;
+
+	
+	  public Line() { y = 0; }
+	 
+	  public float project() { return (float) (y / (height / 0.2f)); }
+	 
 
 
-	public Line() {
-		 x=y=z=0 ; 
-	}
-
-	public float project() {
-		return y /(height/0.2f);
-	}
 }
