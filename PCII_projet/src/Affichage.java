@@ -5,6 +5,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Random;
+
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -21,10 +24,9 @@ public class Affichage extends JPanel {
 	private BufferedImage carStraight;
 	private BufferedImage carLeft;
 	private BufferedImage carRight;
-	private int dimBack = (int) HEIGHT / 2;
 	private JLabel stats;
-	int roadW = 2000;
-	private int drawDistance = 1500;
+	int drawDistance = 300;
+	public ArrayList<Star> stars = new ArrayList<Star>();
 
 	/* constructeur de la classe Affichage */
 	public Affichage(Road r, Car c) {
@@ -36,10 +38,10 @@ public class Affichage extends JPanel {
 		stats.setAlignmentX(TOP_ALIGNMENT);
 		stats.setBounds(0, 0, 300, 300);
 		this.add(stats);
-		URL url1Img = getClass().getResource("/background.png");
-		URL url2Img = getClass().getResource("/player_straight.png");
-		URL url3Img = getClass().getResource("/player_left.png");
-		URL url4Img = getClass().getResource("/player_right.png");
+		URL url1Img = getClass().getResource("/space-1.png");
+		URL url2Img = getClass().getResource("/player_starship.png");
+		URL url3Img = getClass().getResource("/player_starship.png");
+		URL url4Img = getClass().getResource("/player_starship.png");
 
 		try {
 			background = ImageIO.read(url1Img);
@@ -50,19 +52,28 @@ public class Affichage extends JPanel {
 			e.printStackTrace();
 		}
 
+		for (int i = 0; i < 100; i++) {
+			stars.add(new Star());
+		}
+		(new Decor(this)).start();
+
 	}
 
 	@Override
 	public void paint(Graphics g) {
 
-		g.drawImage(background, 0, 0, WIDTH, dimBack, this);
-		setOpaque(false);
+		// g.drawImage(background, 0, 0, WIDTH, dimBack, this);
+
 		super.paint(g);
+		g.setColor(Color.BLACK);
+	    g.fillRect(0, 0, WIDTH, HEIGHT / 2+20);
 		drawRoad(g);
-		setOpaque(true);
 		drawCar(g);
 		setSpeed();
 		vehicule.checkCross();
+		g.translate(WIDTH / 2, HEIGHT / 4);
+	    drawStars(g);
+		g.translate(0, 0);
 
 	}
 
@@ -72,15 +83,15 @@ public class Affichage extends JPanel {
 	 * @param g
 	 */
 	private void drawCar(Graphics g) {
-		int carPos = (int) ((WIDTH / 2) + (WIDTH * vehicule.position / 2.f) - (256 / 2));
+		int carPos = (int) ((WIDTH / 2) + (WIDTH * vehicule.position / 2.f) - (251 / 2));
 		if (vehicule.isUp || vehicule.isDown) {
-			g.drawImage(carStraight, carPos, HEIGHT - 136, this);
+			g.drawImage(carStraight, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
 		} else if (vehicule.isLeft) {
-			g.drawImage(carLeft, carPos, HEIGHT - 136, this);
+			g.drawImage(carLeft, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
 		} else if (vehicule.isRight) {
-			g.drawImage(carRight, carPos, HEIGHT - 136, this);
+			g.drawImage(carRight, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
 		} else {
-			g.drawImage(carStraight, carPos, HEIGHT - 136, this);
+			g.drawImage(carStraight, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
 		}
 
 	}
@@ -93,46 +104,45 @@ public class Affichage extends JPanel {
 
 	private void drawRoad(Graphics g) {
 		road.findPos();
-		int currentPos = (int) (vehicule.score / road.segLength);
+	    int currentPos = road.findSegmentIndex(vehicule.score);
 		double x = 0, dx = 0;
 		double maxY = HEIGHT;
-		int camH = 1500;
+		int camH = 2500;
+		if(currentPos + drawDistance >1500) {
+			currentPos = 0 ;
+			vehicule.score = 0 ;
+		}
 		for (int n = 0; n < drawDistance; n++) {
-			Line l = road.lines.get((n + currentPos) % road.sizeR);
+			Line l = road.lines.get((currentPos + n) );
 			l.project((int) (vehicule.position - (int) x), camH, (int) vehicule.score);
+			x += dx;
+			dx += l.curve;
 			Line p = null;
-			if (l.Y > 0 && l.Y < maxY) {
-				p = road.lines.get(((n + currentPos) - 1) % road.sizeR);
+			if (l.Y > 0 && l.Y < maxY  ) {
+				p = road.lines.get((currentPos + n - 1));
 			} else {
 				p = l;
 			}
 			maxY = l.Y;
 			float persp = (float) (l.z / (HEIGHT / 0.2f));
-			Color grass = Math.sin(60.0f * (1.0f - persp) + vehicule.distance * 0.1f) > 0.0f ? new Color(16, 200, 16)
-					: new Color(0, 154, 0);
-
+			Color grass = Math.sin(90.0f * (1.0f - persp) + vehicule.distance * 0.01f) > 0.0f ? new Color(51, 135, 255)
+					: new Color(0, 0, 204);
 			Color clip = Math.sin(80.0f * (1.0f - persp) + vehicule.distance * 0.1f) > 0.0f ? new Color(255, 255, 255)
-					: new Color(255, 0, 0);
-
-			Color r = road.tracksection - 1 == 0 ? Color.WHITE : Color.GRAY;
-
+					: Color.black;
+			Color r = road.tracksection - 1 == 0 ? Color.WHITE : Color.blue;
 			drawQwad(g, grass, 0, (int) p.Y, WIDTH, 0, (int) l.Y, WIDTH);
 			drawQwad(g, clip, (int) p.X, (int) p.Y, (int) (p.W * 1.5), (int) l.X, (int) l.Y, (int) (l.W * 1.5));
-
 			drawQwad(g, r, (int) p.X, (int) p.Y, (int) (p.W * 1.4), (int) l.X, (int) l.Y, (int) (l.W * 1.4));
-
-			drawQwad(g, r, (int) p.X, (int) p.Y, (int) (p.W * 0.7), (int) l.X, (int) l.Y, (int) (l.W * 0.7));
-
+            
 		}
 
 	}
 
 	private void setSpeed() {
-		this.stats.setText("<html>Speed:" + new DecimalFormat("##.##").format(this.vehicule.speed)+"<br>"
-				+ "Score:"
-				+ new DecimalFormat("##").format(this.vehicule.score)+"<br>"
-						+ "Lap Time:"+this.vehicule.lastLapTime+"<br>"
-		+ "distance:"+new DecimalFormat("##").format(this.vehicule.distance)+vehicule.crossed+road.tracksection+"</html>");
+		boolean check = vehicule.checkOffRoad();
+		this.stats.setText("<html>Speed:" + new DecimalFormat("##.##").format(this.vehicule.speed) + "<br>" + "Score:"
+				+ new DecimalFormat("##").format(this.vehicule.score) + "<br>" + "Lap Time:" + this.vehicule.lastLapTime
+				+ "<br>" + "distance:" + new DecimalFormat("##").format(this.vehicule.distance) + check + "</html>");
 	}
 
 	void drawQwad(Graphics g, Color c, int x1, int y1, int w1, int x2, int y2, int w2) {
@@ -141,6 +151,62 @@ public class Affichage extends JPanel {
 		int n = 4;
 		g.setColor(c);
 		g.fillPolygon(xPoints, yPoints, n);
+	}
+
+	void drawStars(Graphics g) {
+		for (Star s : stars) {
+			s.show(g);
+		}
+
+	}
+
+	void updateStars() {
+		for (Star s : stars) {
+			s.update();
+		}
+	}
+
+	class Star {
+		double x;
+		double y;
+		double z;
+		double pz;
+
+		Star() {
+			x = randRange(-WIDTH, WIDTH);
+			y = randRange(-HEIGHT / 2, HEIGHT / 2);
+			z = WIDTH;
+			pz = z;
+		}
+
+		void update() {
+			z = z - vehicule.speed ;
+			if (z < 500) {
+				z = WIDTH;
+				pz = z;
+			}
+		}
+
+		void show(Graphics g) {
+			g.setColor(Color.WHITE);
+			double sx = map(x / z, 0, 1, 0, WIDTH);
+			double sy = map(y / z, 0, 1, 0, HEIGHT / 2);
+			double r = map(z, 0, WIDTH, 16, 0);
+			double px = map(x / pz, 0, 1, 0, WIDTH);
+			;
+			double py = map(y / pz, 0, 1, 0, HEIGHT / 2);
+
+			g.fillOval((int) sx, (int) sy, (int) r, (int) r);
+			g.drawLine((int) px, (int) py, (int) sx, (int) sy);
+		}
+
+		double map(double value, double start1, double stop1, double start2, double stop2) {
+			return (value - start1) / (stop1 - start1) * (stop2 - start2) + start2;
+		}
+
+		private float randRange(float min, float max) {
+			return min + (float) Math.random() * (max - min);
+		}
 	}
 
 }

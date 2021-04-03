@@ -11,8 +11,8 @@ public class Main {
 		c.initPanel(panel);
 		Timer timer = new Timer(30, c);
 	    timer.setInitialDelay(0);
-	    timer.start();
-		//(new Avancer(panel)).start();
+	    timer.start();   
+		(new Avancer(panel)).start();
 		JFrame fenetre = new JFrame("jeu de course");
 		fenetre.setFocusTraversalKeysEnabled(false);
 		fenetre.setFocusable(true);
@@ -24,5 +24,6 @@ public class Main {
 		fenetre.setVisible(true);
 		fenetre.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		fenetre.pack();
+		fenetre.setResizable(false);
 	}
 }
