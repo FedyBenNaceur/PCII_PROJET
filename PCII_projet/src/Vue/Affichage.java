@@ -1,3 +1,4 @@
+package Vue;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -12,6 +13,11 @@ import javax.imageio.ImageIO;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import Controleur.Decor;
+import Model.Car;
+import Model.Line;
+import Model.Road;
+
 /*Classe Affichage qui gère la vue*/
 public class Affichage extends JPanel {
 
@@ -25,7 +31,7 @@ public class Affichage extends JPanel {
 	private BufferedImage carLeft;
 	private BufferedImage carRight;
 	private JLabel stats;
-	int drawDistance = 300;
+	public int drawDistance = 300;
 	public ArrayList<Star> stars = new ArrayList<Star>();
 
 	/* constructeur de la classe Affichage */
@@ -160,7 +166,7 @@ public class Affichage extends JPanel {
 
 	}
 
-	void updateStars() {
+	public void updateStars() {
 		for (Star s : stars) {
 			s.update();
 		}

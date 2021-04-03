@@ -1,3 +1,6 @@
+package Controleur;
+
+import Vue.Affichage;
 
 public class Avancer extends Thread {
 	private int time_to_sleep = 50;

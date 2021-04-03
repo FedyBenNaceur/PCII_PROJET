@@ -1,4 +1,7 @@
+package Model;
 import java.util.ArrayList;
+
+import Vue.Affichage;
 
 /*Classe qui represente la piste */
 public class Road {

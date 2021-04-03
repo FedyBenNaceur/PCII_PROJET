@@ -1,3 +1,4 @@
+package Model;
 
 public class Pair {
 	private  float p1 ;

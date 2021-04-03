@@ -1,3 +1,4 @@
+package Model;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -5,6 +6,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Random;
+
+import Vue.Affichage;
 
 /** Classe qui represente le vehicule */
 public class Car extends KeyAdapter implements ActionListener {
@@ -32,7 +35,7 @@ public class Car extends KeyAdapter implements ActionListener {
 
 	}
 
-	void initPanel(Affichage a) {
+	public void initPanel(Affichage a) {
 		panel = a;
 	}
 
