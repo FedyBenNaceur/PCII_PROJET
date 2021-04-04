@@ -15,10 +15,11 @@ public class Car extends KeyAdapter implements ActionListener {
 	public Affichage panel;// L'affichage
 	public float distance = 0f;
 	public float speed = 0f;
-	public float maxUpSpeed = 246f ;
-	public float upSpeed = 0f ;
-	public float upAcceleration = 5f ;
+	public float maxUpSpeed = 246f;
+	public float upSpeed = 0f;
+	public float upAcceleration = 5f;
 	public final float acceleration = 5f;
+	public final float decceleration = 1f ;
 	public final float maxSpeed = 200f;
 	public boolean isUp, isLeft, isRight, isDown;
 	public boolean released = true;
@@ -27,7 +28,7 @@ public class Car extends KeyAdapter implements ActionListener {
 	public long startChrono;
 	public long lastLapTime;
 	public boolean crossed = true;
-
+	public float travelDistance = 0;
 
 	@Override
 	public void keyTyped(KeyEvent e) {
@@ -39,7 +40,6 @@ public class Car extends KeyAdapter implements ActionListener {
 		panel = a;
 	}
 
-	
 	public void actionPerformed(ActionEvent e) {
 
 		if (released) {
@@ -50,7 +50,7 @@ public class Car extends KeyAdapter implements ActionListener {
 			}
 		}
 		if (isUp)
-			if (upSpeed+upAcceleration <= maxUpSpeed) {
+			if (upSpeed + upAcceleration <= maxUpSpeed) {
 				upSpeed += upAcceleration;
 			}
 		if (isLeft) {
@@ -59,25 +59,26 @@ public class Car extends KeyAdapter implements ActionListener {
 		if (isRight) {
 			position += speed / 10000;
 		}
-		if (isDown && speed > 0) {
-			if (speed - acceleration < 0) {
+		if (isDown && speed > 0 || upSpeed!=0) {
+			if (speed - decceleration < 0) {
 				speed = 0;
 			} else {
-				speed -= acceleration;
+				speed -= decceleration;
 			}
 		}
-		
+
+
 		if (!start) {
 			startChrono = System.currentTimeMillis() / 1000;
 			start = true;
 			lastLapTime = 0;
 		}
 		distance += speed;
+		travelDistance += speed;
 		score += speed;
 
 		panel.repaint();
 	}
-	
 
 	@Override
 	public void keyPressed(KeyEvent e) {
@@ -134,8 +135,8 @@ public class Car extends KeyAdapter implements ActionListener {
 			} else {
 				p = l;
 			}
-			
-			//System.out.println(carPos+"|||"+(p.X-(p.W * 1.4)));
+
+			// System.out.println(carPos+"|||"+(p.X-(p.W * 1.4)));
 			if (carPos <= p.X - (p.W * 1.4)) {
 				return false;
 			}
@@ -143,7 +144,5 @@ public class Car extends KeyAdapter implements ActionListener {
 		}
 		return true;
 	}
-	
-	
 
 }

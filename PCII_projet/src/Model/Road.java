@@ -57,7 +57,7 @@ public class Road {
 
 	private void initCurvs() {
 
-		curvs.add(new Pair(0f, 1000));
+		curvs.add(new Pair(0f, 2000));
 		curvs.add(new Pair(0f, 19000));
 		curvs.add(new Pair(4f, 40000));
 		curvs.add(new Pair(0f, 40000));

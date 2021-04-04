@@ -1,6 +1,8 @@
 package Vue;
+
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -27,9 +29,12 @@ public class Affichage extends JPanel {
 	public Road road;
 	public Car vehicule;
 	private BufferedImage background;
-	private BufferedImage carStraight;
-	private BufferedImage carLeft;
-	private BufferedImage carRight;
+	private BufferedImage shipStraight;
+	private BufferedImage shipLeft;
+	private BufferedImage shipRight;
+	private BufferedImage shipRight_boost;
+	private BufferedImage shipLeft_boost;
+	private BufferedImage shipStraight_boost;
 	private JLabel stats;
 	public int drawDistance = 300;
 	public ArrayList<Star> stars = new ArrayList<Star>();
@@ -44,21 +49,27 @@ public class Affichage extends JPanel {
 		stats.setAlignmentX(TOP_ALIGNMENT);
 		stats.setBounds(0, 0, 300, 300);
 		this.add(stats);
-		URL url1Img = getClass().getResource("/space-1.png");
+		URL url1Img = getClass().getResource("/maxresdefault.jpg");
 		URL url2Img = getClass().getResource("/player_starship.png");
-		URL url3Img = getClass().getResource("/player_starship.png");
-		URL url4Img = getClass().getResource("/player_starship.png");
+		URL url3Img = getClass().getResource("/starship-left.png");
+		URL url4Img = getClass().getResource("/starship-right.png");
+		URL url5Img = getClass().getResource("/starship-right-boost.png");
+		URL url6Img = getClass().getResource("/starship-left-boost.png");
+		URL url7Img = getClass().getResource("/starship-boost.png");
 
 		try {
 			background = ImageIO.read(url1Img);
-			carStraight = ImageIO.read(url2Img);
-			carLeft = ImageIO.read(url3Img);
-			carRight = ImageIO.read(url4Img);
+			shipStraight = ImageIO.read(url2Img);
+			shipLeft = ImageIO.read(url3Img);
+			shipRight = ImageIO.read(url4Img);
+			shipRight_boost = ImageIO.read(url5Img);
+			shipLeft_boost = ImageIO.read(url6Img);
+			shipStraight_boost = ImageIO.read(url7Img);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 500; i++) {
 			stars.add(new Star());
 		}
 		(new Decor(this)).start();
@@ -68,17 +79,16 @@ public class Affichage extends JPanel {
 	@Override
 	public void paint(Graphics g) {
 
-		// g.drawImage(background, 0, 0, WIDTH, dimBack, this);
-
 		super.paint(g);
 		g.setColor(Color.BLACK);
-	    g.fillRect(0, 0, WIDTH, HEIGHT / 2+20);
+		g.drawImage(background, 0, 0, WIDTH, HEIGHT / 2 + 10, this);
+		// g.fillRect(0, 0, WIDTH, HEIGHT / 2 + 20);
 		drawRoad(g);
 		drawCar(g);
-		setSpeed();
+		setTxt(g);
 		vehicule.checkCross();
-		g.translate(WIDTH / 2, HEIGHT / 4);
-	    drawStars(g);
+		g.translate(WIDTH / 2, HEIGHT / 5);
+		drawStars(g);
 		g.translate(0, 0);
 
 	}
@@ -90,14 +100,26 @@ public class Affichage extends JPanel {
 	 */
 	private void drawCar(Graphics g) {
 		int carPos = (int) ((WIDTH / 2) + (WIDTH * vehicule.position / 2.f) - (251 / 2));
-		if (vehicule.isUp || vehicule.isDown) {
-			g.drawImage(carStraight, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
-		} else if (vehicule.isLeft) {
-			g.drawImage(carLeft, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
-		} else if (vehicule.isRight) {
-			g.drawImage(carRight, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
-		} else {
-			g.drawImage(carStraight, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
+		if (vehicule.upSpeed != 0) {
+			if (vehicule.isUp || vehicule.isDown) {
+				g.drawImage(shipStraight, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
+			} else if (vehicule.isLeft) {
+				g.drawImage(shipLeft, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
+			} else if (vehicule.isRight) {
+				g.drawImage(shipRight, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
+			} else {
+				g.drawImage(shipStraight, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
+			}
+		}else {
+			if (vehicule.isUp || vehicule.isDown) {
+				g.drawImage(shipStraight_boost, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
+			} else if (vehicule.isLeft) {
+				g.drawImage(shipLeft_boost, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
+			} else if (vehicule.isRight) {
+				g.drawImage(shipRight_boost, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
+			} else {
+				g.drawImage(shipStraight_boost, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
+			}
 		}
 
 	}
@@ -110,21 +132,21 @@ public class Affichage extends JPanel {
 
 	private void drawRoad(Graphics g) {
 		road.findPos();
-	    int currentPos = road.findSegmentIndex(vehicule.score);
+		int currentPos = road.findSegmentIndex(vehicule.travelDistance);
 		double x = 0, dx = 0;
 		double maxY = HEIGHT;
 		int camH = 2500;
-		if(currentPos + drawDistance >1500) {
-			currentPos = 0 ;
-			vehicule.score = 0 ;
+		if (currentPos + drawDistance > 1500) {
+			currentPos = 0;
+			vehicule.travelDistance = 0;
 		}
 		for (int n = 0; n < drawDistance; n++) {
-			Line l = road.lines.get((currentPos + n) );
-			l.project((int) (vehicule.position - (int) x), camH, (int) vehicule.score);
+			Line l = road.lines.get((currentPos + n));
+			l.project((int) (vehicule.position - (int) x), camH, (int) vehicule.travelDistance);
 			x += dx;
 			dx += l.curve;
 			Line p = null;
-			if (l.Y > 0 && l.Y < maxY  ) {
+			if (l.Y > 0 && l.Y < maxY) {
 				p = road.lines.get((currentPos + n - 1));
 			} else {
 				p = l;
@@ -139,16 +161,18 @@ public class Affichage extends JPanel {
 			drawQwad(g, grass, 0, (int) p.Y, WIDTH, 0, (int) l.Y, WIDTH);
 			drawQwad(g, clip, (int) p.X, (int) p.Y, (int) (p.W * 1.5), (int) l.X, (int) l.Y, (int) (l.W * 1.5));
 			drawQwad(g, r, (int) p.X, (int) p.Y, (int) (p.W * 1.4), (int) l.X, (int) l.Y, (int) (l.W * 1.4));
-            
+
 		}
 
 	}
 
-	private void setSpeed() {
-		boolean check = vehicule.checkOffRoad();
-		this.stats.setText("<html>Speed:" + new DecimalFormat("##.##").format(this.vehicule.speed) + "<br>" + "Score:"
-				+ new DecimalFormat("##").format(this.vehicule.score) + "<br>" + "Lap Time:" + this.vehicule.lastLapTime
-				+ "<br>" + "distance:" + new DecimalFormat("##").format(this.vehicule.distance) + check + "</html>");
+	private void setTxt(Graphics g) {
+		g.setColor(Color.MAGENTA);
+		g.setFont(new Font("TimesRoman", Font.PLAIN + 1, (WIDTH + HEIGHT) / 100));
+		g.drawString("Score : " + new DecimalFormat("##.##").format(this.vehicule.score), 20, 40);
+		g.drawString("Temps : " + vehicule.lastLapTime, WIDTH - (WIDTH + HEIGHT) / 13, 40);
+		g.drawString(new DecimalFormat("##.##").format(this.vehicule.speed) + " km/h", 20,
+				HEIGHT - (WIDTH + HEIGHT) / 30);
 	}
 
 	void drawQwad(Graphics g, Color c, int x1, int y1, int w1, int x2, int y2, int w2) {
@@ -186,7 +210,7 @@ public class Affichage extends JPanel {
 		}
 
 		void update() {
-			z = z - vehicule.speed ;
+			z = z - vehicule.speed;
 			if (z < 500) {
 				z = WIDTH;
 				pz = z;
@@ -199,11 +223,10 @@ public class Affichage extends JPanel {
 			double sy = map(y / z, 0, 1, 0, HEIGHT / 2);
 			double r = map(z, 0, WIDTH, 16, 0);
 			double px = map(x / pz, 0, 1, 0, WIDTH);
-			;
 			double py = map(y / pz, 0, 1, 0, HEIGHT / 2);
 
 			g.fillOval((int) sx, (int) sy, (int) r, (int) r);
-			g.drawLine((int) px, (int) py, (int) sx, (int) sy);
+			// g.drawLine((int) px, (int) py, (int) sx, (int) sy);
 		}
 
 		double map(double value, double start1, double stop1, double start2, double stop2) {
