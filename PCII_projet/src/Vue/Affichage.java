@@ -24,18 +24,21 @@ import Model.Line;
 import Model.Menu;
 import Model.Road;
 
-/*Classe Affichage qui gère la vue*/
+/**
+ * Classe Affichage qui gère la vue
+ * 
+ * @author Fedy
+ *
+ */
 public class Affichage extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	public final int HEIGHT = 768;// largeur et hauteur correspondent respectivement a la largeur et hauteur de la
 									// // Panel
 	public final int WIDTH = 1600;
 	public Road road;
 	public Car vehicule;
+	// les resources utilisés
 	private BufferedImage background;
 	private BufferedImage shipStraight;
 	private BufferedImage shipLeft;
@@ -47,28 +50,23 @@ public class Affichage extends JPanel {
 	private BufferedImage earth;
 	private BufferedImage moon;
 
-	private JLabel stats;
-	public int drawDistance = 300;
-	public ArrayList<Star> stars = new ArrayList<Star>();
+	public int drawDistance = 300;// Percise combien de segment affiché a partir du premier
+	public ArrayList<Star> stars = new ArrayList<Star>();// Decor
 
 	public enum STATE {
-		MENU, GAME,LOST;
-	};
+		MENU, GAME, LOST;
+	};// represente l'etat du jeu
 
 	public STATE state = STATE.MENU;
-	public Menu menu ;
-	public boolean endGame = false ;
+	public Menu menu;
+	public boolean endGame = false;// vaut vrai si la partie est perdue faux sinon
 
 	/* constructeur de la classe Affichage */
 	public Affichage(Road r, Car c) {
 		this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		road = r;
 		vehicule = c;
-		this.stats = new JLabel("Speed");
 		this.setLayout(null);
-		stats.setAlignmentX(TOP_ALIGNMENT);
-		stats.setBounds(0, 0, 300, 300);
-		this.add(stats);
 		URL url1Img = getClass().getResource("/BackGround.png");
 		URL url2Img = getClass().getResource("/player_starship.png");
 		URL url3Img = getClass().getResource("/starship-left.png");
@@ -94,13 +92,13 @@ public class Affichage extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		// On initialise la liste des étoiles
 		for (int i = 0; i < 500; i++) {
 			stars.add(new Star());
 		}
 		(new Decor(this)).start();
-		 menu = new Menu(this);
-		 this.addMouseListener(new MouseInput(this));
+		menu = new Menu(this);
+		this.addMouseListener(new MouseInput(this));
 
 	}
 
@@ -108,25 +106,27 @@ public class Affichage extends JPanel {
 	public void paint(Graphics g) {
 
 		super.paint(g);
+		// L'affichage si on est en train de jouer
 		if (state == STATE.GAME) {
 			g.setColor(Color.BLACK);
 			g.drawImage(background, 0, 0, WIDTH, HEIGHT / 2 + 10, this);
-			// g.fillRect(0, 0, WIDTH, HEIGHT / 2 + 20);
 			drawRoad(g);
 			drawCar(g);
 			setTxt(g);
 			g.translate(WIDTH / 2, HEIGHT / 5);
 			drawStars(g);
 			g.translate(0, 0);
-		}else if (state== STATE.MENU) {
+		} // L'affichage si on est dans le menu
+		else if (state == STATE.MENU) {
 			g.drawImage(background, 0, 0, WIDTH, HEIGHT, this);
 			menu.render(g);
-		}else {
+		} // L'affichage si la partie est perdue
+		else {
 			g.drawImage(background, 0, 0, WIDTH, HEIGHT, this);
 			Font fnt = new Font("arial", Font.BOLD, 50);
 			g.setFont(fnt);
 			g.setColor(Color.white);
-			g.drawString("OUPSIES YOU LOST!!!!!", WIDTH / 2-200, 100);
+			g.drawString("OUPSIES YOU LOST!!!!!", WIDTH / 2 - 200, 100);
 		}
 
 	}
@@ -138,6 +138,7 @@ public class Affichage extends JPanel {
 	 */
 	private void drawCar(Graphics g) {
 		int carPos = (int) ((WIDTH / 2) + (WIDTH * vehicule.position / 2.f) - (251 / 2));
+		// si le vehicule est en train de voler
 		if (vehicule.upSpeed != 0) {
 			if (vehicule.isUp || vehicule.isDown) {
 				g.drawImage(shipStraight, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
@@ -148,7 +149,8 @@ public class Affichage extends JPanel {
 			} else {
 				g.drawImage(shipStraight, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
 			}
-		} else {
+		} // Si le vehicule est sur la piste
+		else {
 			if (vehicule.isUp || vehicule.isDown) {
 				g.drawImage(shipStraight_boost, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
 			} else if (vehicule.isLeft) {
@@ -222,6 +224,11 @@ public class Affichage extends JPanel {
 		}
 	}
 
+	/**
+	 * Procedure qui permet d'afficher les informations du joueur
+	 * 
+	 * @param g
+	 */
 	private void setTxt(Graphics g) {
 		g.setColor(Color.MAGENTA);
 		g.setFont(new Font("TimesRoman", Font.PLAIN + 1, (WIDTH + HEIGHT) / 100));
@@ -232,6 +239,18 @@ public class Affichage extends JPanel {
 				HEIGHT - (WIDTH + HEIGHT) / 30);
 	}
 
+	/**
+	 * Methode qui dessine un polygone
+	 * 
+	 * @param g
+	 * @param c  couleur du polygon
+	 * @param x1 l'abscisse du premier point du milieu
+	 * @param y1 l'ordonné du premier point
+	 * @param w1 la moitié de la largeur du polygon
+	 * @param x2 l'abscisse du premier point du milieu
+	 * @param y2 l'ordonné du premier point
+	 * @param w2 la moitié de la largeur du polygon
+	 */
 	void drawQwad(Graphics g, Color c, int x1, int y1, int w1, int x2, int y2, int w2) {
 		int[] xPoints = { x1 - w1, x2 - w2, x2 + w2, x1 + w1 };
 		int[] yPoints = { y1, y2, y2, y1 };
@@ -240,18 +259,30 @@ public class Affichage extends JPanel {
 		g.fillPolygon(xPoints, yPoints, n);
 	}
 
+	/**
+	 * Dessine les planetes en decor
+	 * @param g
+	 * @param x l'abscisse de la première image 
+	 */
 	void drawPlanet(Graphics g, int x) {
 		g.drawImage(earth, (int) (x), 0, 100, 100, this);
 		g.drawImage(moon, (int) (WIDTH - x), 100, 100, 100, this);
 	}
-
+    
+	/**
+	 * Methode qui affiche les étoiles dans le decor
+	 * @param g
+	 */
 	void drawStars(Graphics g) {
 		for (Star s : stars) {
 			s.show(g);
 		}
 
 	}
-
+    
+	/**
+	 * Methode qui met a jour les etoiles
+	 */
 	public void updateStars() {
 		for (Star s : stars) {
 			s.update();
@@ -259,32 +290,41 @@ public class Affichage extends JPanel {
 	}
 
 	class Star {
-		double x;
+		double x;//Coordonées de l'étoile
 		double y;
 		double z;
-		double pz;
+	
 
+		/**
+		 * Constructeur de l'etoile
+		 */
 		Star() {
+			//place d'une manière aléatoire l'etoile
 			x = randRange(-WIDTH, WIDTH);
 			y = randRange(-HEIGHT / 2, HEIGHT / 2);
 			z = WIDTH;
-			pz = z;
 		}
 
+		/**
+		 * Met a jour la postion de l'etoile
+		 */
 		void update() {
 			z = z - vehicule.speed;
 			if (z < 500) {
 				z = WIDTH;
-				pz = z;
 			}
 		}
-
+       
+		/**
+		 * Procedure qui affiche l'etoile
+		 */
 		void show(Graphics g) {
 			g.setColor(Color.WHITE);
+		    //On normalise les coordonnées des etoiles 
 			double sx = map(x / z, 0, 1, 0, WIDTH);
 			double sy = map(y / z, 0, 1, 0, HEIGHT / 2);
+			//Plus l'etoile est proche plus elle est grande
 			double r = map(z, 0, WIDTH, 16, 0);
-
 			g.fillOval((int) sx, (int) sy, (int) r, (int) r);
 		}
 

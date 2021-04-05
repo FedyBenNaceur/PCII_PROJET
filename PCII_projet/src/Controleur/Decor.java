@@ -2,6 +2,12 @@ package Controleur;
 
 import Vue.Affichage;
 
+/**
+ * Classe décor qui s'occupe de mettre a jour les positions des étoiles dans le décor
+ * @author Fedy
+ *
+ */
+
 public class Decor extends Thread {
 	private int time_to_sleep = 200;
 	private Affichage panel;
