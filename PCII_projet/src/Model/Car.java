@@ -9,6 +9,7 @@ import java.awt.event.KeyListener;
 import java.util.Random;
 
 import Vue.Affichage;
+import Vue.Affichage.STATE;
 
 /** Classe qui represente le vehicule */
 public class Car {
@@ -32,6 +33,7 @@ public class Car {
 	public float travelDistance = 0;
 	public long estimatedCrossTime = 45 ;
 	public long remainingTime ;
+	public boolean starting = true ;
 
 	public void initPanel(Affichage a) {
 		panel = a;
@@ -72,7 +74,12 @@ public class Car {
 	
 	
 	public boolean checkEndGame () {
-		return false;
+		if ((speed==0 &&!starting )|| (remainingTime==0 && !starting)) {
+			panel.state = STATE.LOST;
+			panel.repaint();
+			return true ; 
+		}
+		return false ;
 	}
 
 }

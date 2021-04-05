@@ -53,6 +53,10 @@ public class KeyController extends KeyAdapter implements ActionListener {
 			c.distance += c.speed;
 			c.travelDistance += c.speed;
 			c.score += c.speed;
+			
+			if (c.score >= 300) {
+				c.starting = false ;
+			}
 
 			c.panel.repaint();
 		}

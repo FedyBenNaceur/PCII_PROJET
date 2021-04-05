@@ -27,6 +27,10 @@ import Model.Road;
 /*Classe Affichage qui gère la vue*/
 public class Affichage extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public final int HEIGHT = 768;// largeur et hauteur correspondent respectivement a la largeur et hauteur de la
 									// // Panel
 	public final int WIDTH = 1600;
@@ -48,11 +52,12 @@ public class Affichage extends JPanel {
 	public ArrayList<Star> stars = new ArrayList<Star>();
 
 	public enum STATE {
-		MENU, GAME;
+		MENU, GAME,LOST;
 	};
 
 	public STATE state = STATE.MENU;
 	public Menu menu ;
+	public boolean endGame = false ;
 
 	/* constructeur de la classe Affichage */
 	public Affichage(Road r, Car c) {
@@ -116,6 +121,12 @@ public class Affichage extends JPanel {
 		}else if (state== STATE.MENU) {
 			g.drawImage(background, 0, 0, WIDTH, HEIGHT, this);
 			menu.render(g);
+		}else {
+			g.drawImage(background, 0, 0, WIDTH, HEIGHT, this);
+			Font fnt = new Font("arial", Font.BOLD, 50);
+			g.setFont(fnt);
+			g.setColor(Color.white);
+			g.drawString("OUPSIES YOU LOST!!!!!", WIDTH / 2-200, 100);
 		}
 
 	}

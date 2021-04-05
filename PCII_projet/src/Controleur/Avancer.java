@@ -15,7 +15,7 @@ public class Avancer extends Thread {
 	@Override
 	public void run() {
 		try {
-			while (true) {
+			while (!panel.vehicule.checkEndGame()||panel.vehicule.starting) {
 				if (panel.state == STATE.GAME) {
 					if (panel.vehicule.upSpeed < 50) {
 						if (panel.vehicule.speed + panel.vehicule.acceleration <= panel.vehicule.maxSpeed) {
