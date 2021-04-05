@@ -1,12 +1,14 @@
 package Model;
+
 import java.util.ArrayList;
+import java.util.Random;
 
 import Vue.Affichage;
 
 /*Classe qui represente la piste */
 public class Road {
 	private Affichage panel;
-	public final int segLength =200;// taille des segements de la piste
+	public final int segLength = 200;// taille des segements de la piste
 	public int sizeR;
 	public ArrayList<Line> lines = new ArrayList<Line>();// stocker les valeurs des lignes qui representes la piste
 	public ArrayList<Pair> curvs = new ArrayList<Pair>();
@@ -22,20 +24,25 @@ public class Road {
 	 */
 
 	private void initLines() {
-		int j = 0 ; 
+		int j = 0;
 		float c = curvs.get(j).getFst();
 		float d = curvs.get(j).getScd();
-		float x = 0 ;
+		float x = 0;
+		Random r = new Random();
 		for (int i = 0; i < 1600; i++) {
 			Line line = new Line();
-			if (i*segLength-x>d && j<curvs.size()-1) {
+			if (i * segLength - x > d && j < curvs.size() - 1) {
 				j++;
 				d = curvs.get(j).getScd();
-			    c = curvs.get(j).getFst();
-			    x = i*segLength ;
+				c = curvs.get(j).getFst();
+				x = i * segLength;
 			}
-			line.z = i * segLength;		
-			line.curve = c ;
+			if (i > 100) {
+				line.obstacle = r.nextInt(100) == 5 ? true : false;
+				line.obsX = r.nextDouble() * 50;
+			}
+			line.z = i * segLength;
+			line.curve = c;
 			lines.add(line);
 		}
 		sizeR = lines.size();
@@ -86,6 +93,32 @@ public class Road {
 
 	public int findSegmentIndex(float z) {
 		return (int) (z / segLength) % sizeR;
+	}
+
+	public void chuffleRoad() {
+		for (Pair p : curvs) {
+			int n = (int) (Math.random() * (3 + 1));
+			if (n == 0) {
+				p.setFst(0);
+			} else if (n == 1) {
+                p.setFst(4);
+			}else {
+				p.setFst(-4);
+			}
+		}
+		int j = 0;
+		float c = curvs.get(j).getFst();
+		float d = curvs.get(j).getScd();
+		float x = 0;
+		for (int i = 0 ;i<sizeR;i++) {
+			if (i * segLength - x > d && j < curvs.size() - 1) {
+				j++;
+				d = curvs.get(j).getScd();
+				c = curvs.get(j).getFst();
+				x = i * segLength;
+			}
+		}
+
 	}
 
 }

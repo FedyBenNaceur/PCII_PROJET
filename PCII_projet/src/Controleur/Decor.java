@@ -15,7 +15,7 @@ public class Decor extends Thread {
 	public void run() {
 		try {
 			while (true) {
-				panel.updateStars();         
+				panel.updateStars();  
 				Thread.sleep(time_to_sleep);
 			}
 		} catch (Exception e) {

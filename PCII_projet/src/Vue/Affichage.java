@@ -35,6 +35,10 @@ public class Affichage extends JPanel {
 	private BufferedImage shipRight_boost;
 	private BufferedImage shipLeft_boost;
 	private BufferedImage shipStraight_boost;
+	private BufferedImage obstacle;
+	private BufferedImage earth;
+	private BufferedImage moon;
+
 	private JLabel stats;
 	public int drawDistance = 300;
 	public ArrayList<Star> stars = new ArrayList<Star>();
@@ -49,13 +53,16 @@ public class Affichage extends JPanel {
 		stats.setAlignmentX(TOP_ALIGNMENT);
 		stats.setBounds(0, 0, 300, 300);
 		this.add(stats);
-		URL url1Img = getClass().getResource("/maxresdefault.jpg");
+		URL url1Img = getClass().getResource("/BackGround.png");
 		URL url2Img = getClass().getResource("/player_starship.png");
 		URL url3Img = getClass().getResource("/starship-left.png");
 		URL url4Img = getClass().getResource("/starship-right.png");
 		URL url5Img = getClass().getResource("/starship-right-boost.png");
 		URL url6Img = getClass().getResource("/starship-left-boost.png");
 		URL url7Img = getClass().getResource("/starship-boost.png");
+		URL url8Img = getClass().getResource("/obstacle.png");
+		URL url9Img = getClass().getResource("/earth.png");
+		URL url0Img = getClass().getResource("/moon.png");
 
 		try {
 			background = ImageIO.read(url1Img);
@@ -65,6 +72,9 @@ public class Affichage extends JPanel {
 			shipRight_boost = ImageIO.read(url5Img);
 			shipLeft_boost = ImageIO.read(url6Img);
 			shipStraight_boost = ImageIO.read(url7Img);
+			obstacle = ImageIO.read(url8Img);
+			earth = ImageIO.read(url9Img);
+			moon = ImageIO.read(url0Img);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -86,7 +96,6 @@ public class Affichage extends JPanel {
 		drawRoad(g);
 		drawCar(g);
 		setTxt(g);
-		vehicule.checkCross();
 		g.translate(WIDTH / 2, HEIGHT / 5);
 		drawStars(g);
 		g.translate(0, 0);
@@ -110,7 +119,7 @@ public class Affichage extends JPanel {
 			} else {
 				g.drawImage(shipStraight, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
 			}
-		}else {
+		} else {
 			if (vehicule.isUp || vehicule.isDown) {
 				g.drawImage(shipStraight_boost, carPos, (int) (HEIGHT - 136 - vehicule.upSpeed), this);
 			} else if (vehicule.isLeft) {
@@ -135,11 +144,14 @@ public class Affichage extends JPanel {
 		int currentPos = road.findSegmentIndex(vehicule.travelDistance);
 		double x = 0, dx = 0;
 		double maxY = HEIGHT;
-		int camH = 2500;
+		int camH = 2500 + (int) road.lines.get(currentPos).y;
 		if (currentPos + drawDistance > 1500) {
 			currentPos = 0;
 			vehicule.travelDistance = 0;
+			resetHit();
+			road.chuffleRoad();
 		}
+		int pX = 0;
 		for (int n = 0; n < drawDistance; n++) {
 			Line l = road.lines.get((currentPos + n));
 			l.project((int) (vehicule.position - (int) x), camH, (int) vehicule.travelDistance);
@@ -161,9 +173,24 @@ public class Affichage extends JPanel {
 			drawQwad(g, grass, 0, (int) p.Y, WIDTH, 0, (int) l.Y, WIDTH);
 			drawQwad(g, clip, (int) p.X, (int) p.Y, (int) (p.W * 1.5), (int) l.X, (int) l.Y, (int) (l.W * 1.5));
 			drawQwad(g, r, (int) p.X, (int) p.Y, (int) (p.W * 1.4), (int) l.X, (int) l.Y, (int) (l.W * 1.4));
-
+			drawQwad(g, r, (int) p.X, (int) p.Y, (int) (p.W * 0.7), (int) l.X, (int) l.Y, (int) (l.W * 0.7));
+			if (p.obstacle && n<50 && !p.hit) {
+				int size = (int)( 100) ;
+				 g.drawImage(obstacle, (int)(p.X+p.obsX),(int)p.Y,size,size,this);
+				 if(vehicule.checkCollision((int)(p.X+p.obsX),(int)p.Y ,size , size)) {
+					 p.hit = true;
+				 }
+			}
+			pX = (int) p.X ;
 		}
+		drawPlanet(g,pX);
 
+	}
+	
+	private void resetHit () {
+		for (Line l : road.lines) {
+			l.hit = false ;
+		}
 	}
 
 	private void setTxt(Graphics g) {
@@ -182,6 +209,11 @@ public class Affichage extends JPanel {
 		g.setColor(c);
 		g.fillPolygon(xPoints, yPoints, n);
 	}
+	
+	void drawPlanet(Graphics g,int x) {
+		g.drawImage(earth, (int)(x),0,100,100,this);
+		g.drawImage(moon, (int)(WIDTH-x),100,100,100,this);
+	}
 
 	void drawStars(Graphics g) {
 		for (Star s : stars) {
@@ -195,6 +227,7 @@ public class Affichage extends JPanel {
 			s.update();
 		}
 	}
+	
 
 	class Star {
 		double x;
@@ -222,11 +255,8 @@ public class Affichage extends JPanel {
 			double sx = map(x / z, 0, 1, 0, WIDTH);
 			double sy = map(y / z, 0, 1, 0, HEIGHT / 2);
 			double r = map(z, 0, WIDTH, 16, 0);
-			double px = map(x / pz, 0, 1, 0, WIDTH);
-			double py = map(y / pz, 0, 1, 0, HEIGHT / 2);
 
 			g.fillOval((int) sx, (int) sy, (int) r, (int) r);
-			// g.drawLine((int) px, (int) py, (int) sx, (int) sy);
 		}
 
 		double map(double value, double start1, double stop1, double start2, double stop2) {

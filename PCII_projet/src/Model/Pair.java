@@ -18,5 +18,8 @@ public class Pair {
 		return p2 ;
 	}
 	
+	public void setFst(float c) {
+		this.p1 = c; 
+	}
 
 }

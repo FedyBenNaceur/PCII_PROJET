@@ -3,6 +3,7 @@ package Vue;
 import javax.swing.Timer;
 
 import Controleur.Avancer;
+import Controleur.KeyController;
 import Model.Car;
 import Model.Road;
 
@@ -15,7 +16,8 @@ public class Main {
 		Affichage panel = new Affichage(r,c);
 		r.initialisePanel(panel);
 		c.initPanel(panel);
-		Timer timer = new Timer(30, c);
+		KeyController kc = new KeyController(c);
+		Timer timer = new Timer(30, kc);
 	    timer.setInitialDelay(0);
 	    timer.start();   
 		(new Avancer(panel)).start();
@@ -24,7 +26,7 @@ public class Main {
 		fenetre.setFocusable(true);
 		fenetre.setLocationRelativeTo(null);
 	    fenetre.setLocation(0, 0);
-		fenetre.addKeyListener(c);
+		fenetre.addKeyListener(kc);
 		fenetre.add(panel);
 		fenetre.pack();
 		fenetre.setVisible(true);

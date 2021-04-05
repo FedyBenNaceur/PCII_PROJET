@@ -1,5 +1,6 @@
 package Model;
 
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -10,7 +11,7 @@ import java.util.Random;
 import Vue.Affichage;
 
 /** Classe qui represente le vehicule */
-public class Car extends KeyAdapter implements ActionListener {
+public class Car {
 	public float position = 0.0f;// position du vehicule
 	public Affichage panel;// L'affichage
 	public float distance = 0f;
@@ -19,7 +20,7 @@ public class Car extends KeyAdapter implements ActionListener {
 	public float upSpeed = 0f;
 	public float upAcceleration = 5f;
 	public final float acceleration = 5f;
-	public final float decceleration = 1f ;
+	public final float decceleration = 0.01f;
 	public final float maxSpeed = 200f;
 	public boolean isUp, isLeft, isRight, isDown;
 	public boolean released = true;
@@ -30,86 +31,8 @@ public class Car extends KeyAdapter implements ActionListener {
 	public boolean crossed = true;
 	public float travelDistance = 0;
 
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
 	public void initPanel(Affichage a) {
 		panel = a;
-	}
-
-	public void actionPerformed(ActionEvent e) {
-
-		if (released) {
-			if (upSpeed - upAcceleration < 0) {
-				upSpeed = 0;
-			} else {
-				upSpeed -= upAcceleration;
-			}
-		}
-		if (isUp)
-			if (upSpeed + upAcceleration <= maxUpSpeed) {
-				upSpeed += upAcceleration;
-			}
-		if (isLeft) {
-			position -= speed / 10000;
-		}
-		if (isRight) {
-			position += speed / 10000;
-		}
-		if (isDown && speed > 0 || upSpeed!=0) {
-			if (speed - decceleration < 0) {
-				speed = 0;
-			} else {
-				speed -= decceleration;
-			}
-		}
-
-
-		if (!start) {
-			startChrono = System.currentTimeMillis() / 1000;
-			start = true;
-			lastLapTime = 0;
-		}
-		distance += speed;
-		travelDistance += speed;
-		score += speed;
-
-		panel.repaint();
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-
-		int code = e.getKeyCode();
-		if (code == KeyEvent.VK_UP) {
-			released = false;
-		}
-		update(code, true);
-
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		int code = e.getKeyCode();
-		if (code == KeyEvent.VK_UP) {
-			released = true;
-		}
-		update(code, false);
-
-	}
-
-	private void update(int code, boolean press) {
-		if (code == KeyEvent.VK_UP)
-			isUp = press;
-		else if (code == KeyEvent.VK_LEFT)
-			isLeft = press;
-		else if (code == KeyEvent.VK_RIGHT)
-			isRight = press;
-		else if (code == KeyEvent.VK_DOWN)
-			isDown = press;
 	}
 
 	public void checkCross() {
@@ -143,6 +66,21 @@ public class Car extends KeyAdapter implements ActionListener {
 
 		}
 		return true;
+	}
+
+	public boolean checkCollision(int x1, int y, int height, int width) {
+		int carPos = (int) ((panel.WIDTH / 2) + (panel.WIDTH * panel.vehicule.position / 2.f) - (251 / 2));
+		Rectangle r1 = new Rectangle(x1, y, height, width);
+		Rectangle r2 = new Rectangle(carPos, (int) (panel.HEIGHT - 136 - panel.vehicule.upSpeed), 251, 136);
+		if (r1.intersects(r2)) {
+			if (speed - 30 > 0) {
+				speed -= 10;
+			} else {
+				speed = 0;
+			}
+			return true ;
+		}
+		return false ;
 	}
 
 }

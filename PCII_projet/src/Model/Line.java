@@ -9,6 +9,9 @@ public class Line {
 	int width = 1600;
 	int height = 768;
 	int roadW = 1500;
+	public boolean obstacle = false; 
+	public double obsX=0 ;
+	public boolean hit = false ; 
 
 	public Line() {
 
