@@ -38,7 +38,7 @@ public class Road {
 				x = i * segLength;
 			}
 			if (i > 100) {
-				line.obstacle = r.nextInt(100) == 5 ? true : false;
+				line.obstacle = r.nextInt(50) == 5 ? true : false;
 				line.obsX = r.nextDouble() * 50;
 			}
 			line.z = i * segLength;

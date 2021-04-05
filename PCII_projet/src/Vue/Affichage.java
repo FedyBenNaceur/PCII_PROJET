@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -13,11 +14,14 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import Controleur.Decor;
+import Controleur.MouseInput;
 import Model.Car;
 import Model.Line;
+import Model.Menu;
 import Model.Road;
 
 /*Classe Affichage qui gère la vue*/
@@ -42,6 +46,13 @@ public class Affichage extends JPanel {
 	private JLabel stats;
 	public int drawDistance = 300;
 	public ArrayList<Star> stars = new ArrayList<Star>();
+
+	public enum STATE {
+		MENU, GAME;
+	};
+
+	public STATE state = STATE.MENU;
+	public Menu menu ;
 
 	/* constructeur de la classe Affichage */
 	public Affichage(Road r, Car c) {
@@ -83,6 +94,8 @@ public class Affichage extends JPanel {
 			stars.add(new Star());
 		}
 		(new Decor(this)).start();
+		 menu = new Menu(this);
+		 this.addMouseListener(new MouseInput(this));
 
 	}
 
@@ -90,15 +103,20 @@ public class Affichage extends JPanel {
 	public void paint(Graphics g) {
 
 		super.paint(g);
-		g.setColor(Color.BLACK);
-		g.drawImage(background, 0, 0, WIDTH, HEIGHT / 2 + 10, this);
-		// g.fillRect(0, 0, WIDTH, HEIGHT / 2 + 20);
-		drawRoad(g);
-		drawCar(g);
-		setTxt(g);
-		g.translate(WIDTH / 2, HEIGHT / 5);
-		drawStars(g);
-		g.translate(0, 0);
+		if (state == STATE.GAME) {
+			g.setColor(Color.BLACK);
+			g.drawImage(background, 0, 0, WIDTH, HEIGHT / 2 + 10, this);
+			// g.fillRect(0, 0, WIDTH, HEIGHT / 2 + 20);
+			drawRoad(g);
+			drawCar(g);
+			setTxt(g);
+			g.translate(WIDTH / 2, HEIGHT / 5);
+			drawStars(g);
+			g.translate(0, 0);
+		}else if (state== STATE.MENU) {
+			g.drawImage(background, 0, 0, WIDTH, HEIGHT, this);
+			menu.render(g);
+		}
 
 	}
 
@@ -174,22 +192,22 @@ public class Affichage extends JPanel {
 			drawQwad(g, clip, (int) p.X, (int) p.Y, (int) (p.W * 1.5), (int) l.X, (int) l.Y, (int) (l.W * 1.5));
 			drawQwad(g, r, (int) p.X, (int) p.Y, (int) (p.W * 1.4), (int) l.X, (int) l.Y, (int) (l.W * 1.4));
 			drawQwad(g, r, (int) p.X, (int) p.Y, (int) (p.W * 0.7), (int) l.X, (int) l.Y, (int) (l.W * 0.7));
-			if (p.obstacle && n<50 && !p.hit) {
-				int size = (int)( 100) ;
-				 g.drawImage(obstacle, (int)(p.X+p.obsX),(int)p.Y,size,size,this);
-				 if(vehicule.checkCollision((int)(p.X+p.obsX),(int)p.Y ,size , size)) {
-					 p.hit = true;
-				 }
+			if (p.obstacle && n < 50 && !p.hit) {
+				int size = (int) (100);
+				g.drawImage(obstacle, (int) (p.X + p.obsX), (int) p.Y, size, size, this);
+				if (vehicule.checkCollision((int) (p.X + p.obsX), (int) p.Y, size, size)) {
+					p.hit = true;
+				}
 			}
-			pX = (int) p.X ;
+			pX = (int) p.X;
 		}
-		drawPlanet(g,pX);
+		drawPlanet(g, pX);
 
 	}
-	
-	private void resetHit () {
+
+	private void resetHit() {
 		for (Line l : road.lines) {
-			l.hit = false ;
+			l.hit = false;
 		}
 	}
 
@@ -197,7 +215,8 @@ public class Affichage extends JPanel {
 		g.setColor(Color.MAGENTA);
 		g.setFont(new Font("TimesRoman", Font.PLAIN + 1, (WIDTH + HEIGHT) / 100));
 		g.drawString("Score : " + new DecimalFormat("##.##").format(this.vehicule.score), 20, 40);
-		g.drawString("Temps : " + vehicule.lastLapTime, WIDTH - (WIDTH + HEIGHT) / 13, 40);
+		g.drawString("Last Lap Time : " + vehicule.lastLapTime, WIDTH - (WIDTH + HEIGHT) / 10, 40);
+		g.drawString("Remaining Time : " + vehicule.remainingTime, WIDTH - (WIDTH + HEIGHT) / 10, 60);
 		g.drawString(new DecimalFormat("##.##").format(this.vehicule.speed) + " km/h", 20,
 				HEIGHT - (WIDTH + HEIGHT) / 30);
 	}
@@ -209,10 +228,10 @@ public class Affichage extends JPanel {
 		g.setColor(c);
 		g.fillPolygon(xPoints, yPoints, n);
 	}
-	
-	void drawPlanet(Graphics g,int x) {
-		g.drawImage(earth, (int)(x),0,100,100,this);
-		g.drawImage(moon, (int)(WIDTH-x),100,100,100,this);
+
+	void drawPlanet(Graphics g, int x) {
+		g.drawImage(earth, (int) (x), 0, 100, 100, this);
+		g.drawImage(moon, (int) (WIDTH - x), 100, 100, 100, this);
 	}
 
 	void drawStars(Graphics g) {
@@ -227,7 +246,6 @@ public class Affichage extends JPanel {
 			s.update();
 		}
 	}
-	
 
 	class Star {
 		double x;
